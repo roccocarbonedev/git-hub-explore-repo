@@ -74,4 +74,10 @@ dependencies {
 
     // ViewModel per Jetpack Compose
     implementation(libs.lifecycle.viewmodel.compose)
+
+    //Coil for network image
+    implementation(libs.coil.compose)
+
+    //navigation
+    implementation(libs.androidx.navigation.compose)
 }
