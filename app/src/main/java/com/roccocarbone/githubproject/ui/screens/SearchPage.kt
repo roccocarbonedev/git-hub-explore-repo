@@ -5,14 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 import coil.compose.rememberAsyncImagePainter
 import com.roccocarbone.githubproject.data.models.Repository
 import com.roccocarbone.githubproject.viewmodel.SearchViewModel
@@ -26,12 +31,16 @@ fun SearchPage(
     val isLoading by searchViewModel.isLoading.collectAsState()
     val errorMessage by searchViewModel.errorMessage.collectAsState()
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    val focusManager = LocalFocusManager.current
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
+
         OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
@@ -43,7 +52,10 @@ fun SearchPage(
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
-            onClick = { searchViewModel.searchRepositories(searchText.text) },
+            onClick = {
+                searchViewModel.searchRepositories(searchText.text)
+                focusManager.clearFocus()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Cerca")
@@ -83,16 +95,24 @@ fun RepositoryItem(repository: Repository, onRepositorySelected: (Repository) ->
             Image(
                 painter = rememberAsyncImagePainter(repository.owner.avatarUrl),
                 contentDescription = "Avatar di ${repository.owner.login}",
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
 
+            Spacer(modifier = Modifier.width(8.dp))
+
             Column {
-                Text(text = repository.name, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    text = "Owner: ${repository.owner.login}",
+                    text = "${repository.name} by ${repository.owner.login} ",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Description: ${repository.description}",
                     style = MaterialTheme.typography.bodySmall
                 )
+
             }
 
         }
